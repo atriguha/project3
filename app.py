@@ -42,10 +42,11 @@ constant_fk2d=0.75
 multiplying_factor_3d=0.5 
 Shear_velocity=2.6**3
 
+st.title('PSAT Project')
 
-constant_fk2d=st.number_input("Enter constant_fk2d")
-multiplying_factor_3d=st.number_input("Enter multiplying factor 3d")
-Shear_velocity=st.number_input("Enter shear velocity")
+constant_fk2d = st.number_input('Enter the constant_fk2d:')
+multiplying_factor_3d = st.number_input('Enter thr multiflying_factor_3d:')
+Shear_velocity = st.number_input('Enter the shear_velocity:')
 
 
 with open(r"Results_v2.csv",mode='a') as file_:
