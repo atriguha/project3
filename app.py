@@ -38,6 +38,14 @@ index=0
 # k=1.5
 g=9.81
 # N=input_data['U'].count()
+constant_fk2d=0.75 
+multiplying_factor_3d=0.5 
+Shear_velocity=2.6**3
+
+
+constant_fk2d=st.number_input("Enter constant_fk2d")
+multiplying_factor_3d=st.number_input("Enter multiplying factor 3d")
+Shear_velocity=st.number_input("Enter shear velocity")
 
 
 with open(r"Results_v2.csv",mode='a') as file_:
@@ -161,9 +169,7 @@ def fk():
     data['w\'v\'v\' mean']=''
     data.at[0,'w\'v\'v\' mean']=round(data['w\'v\'v\''].mean(),3)
 
-    constant_fk2d=0.75 
-    multiplying_factor_3d=0.5 
-    Shear_velocity=2.6**3
+
 
     data.at[index,'fku_2d']=round((data.at[0,'u\'u\'u\' mean']+data.at[0,'u\'w\'w\' mean'])*constant_fk2d,3)
     data.at[index,'Fku_2d']=round(data.at[index,'fku_2d']/Shear_velocity,3)
