@@ -895,6 +895,10 @@ with tab2:
                     header_list = ['Time', 'SL', 'counter', 'U', 'V', 'W', 'W1', 'AMP-U', 'AMP-V', 'AMP-W',
                                 'AMP-W1', 'SNR_U', 'SNR_V', 'SNR_W', 'SNR-W1', 'Corr_U', 'Corr_V', 'Corr_W', 'Corr-W1']
                     dataframe = pd.read_csv(input_filename, delimiter=" +")
+                    if os.path.exists("output")==False:
+                        os.mkdir("output")
+                        
+
                     dataframe.to_csv(os.path.join("output",output_csv), encoding='utf-8',
                                     header=header_list, index=False)
 
