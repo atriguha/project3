@@ -880,7 +880,8 @@ else:
             cnt=100/len(files)
             num=0
             bar=st.progress(num)
-            # bar.progress(100)
+            latest_iteration = st.empty()
+            latest_iteration.text(f'{round(num,2)}%/100.00%')
             for file in files:
                 num+=cnt
                 # print(num)
@@ -1099,7 +1100,8 @@ else:
                         name = add_front_name(name, i)
                         store()
                 bar.progress(int(num))
-
+                latest_iteration.text(f'{round(num,2)}%/100.00%')
+                
 if flag==1:
     time.sleep(0.5)
     st.write("Files Converted Successfully✌")
