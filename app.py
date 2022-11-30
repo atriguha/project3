@@ -1126,17 +1126,19 @@ with tab2:
                     latest_iteration.text(f'{round(num,2)}%/100.00%')
                     
 with tab3:
-    for item in os.listdir("output"):
-        df=pd.read_csv(os.path.join("output",item))
-        
-        csv = df.to_csv().encode('utf-8')
+    if(os.path.exists("output")):
 
-        st.download_button(
-            label="Download"+item,
-            data=csv,
-            file_name=item,
+        for item in os.listdir("output"):
+            df=pd.read_csv(os.path.join("output",item))
             
-        )
+            csv = df.to_csv().encode('utf-8')
+
+            st.download_button(
+                label="Download"+item,
+                data=csv,
+                file_name=item,
+                
+            )
         # st.download_button("Download "+(item), os.path.join("output",item), file_name=item)
 if flag==1:
     time.sleep(0.5)
