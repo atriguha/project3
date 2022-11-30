@@ -1126,8 +1126,9 @@ with tab2:
                     latest_iteration.text(f'{round(num,2)}%/100.00%')
                     
 with tab3:
-    for item in os.listdir("output"):
-        st.download_button("Download "+(files), os.path.join("output",files), file_name=files)
+    if os.path.exists('output'):
+        for item in os.listdir("output"):
+            st.download_button("Download "+(files), os.path.join("output",files), file_name=files)
 if flag==1:
     time.sleep(0.5)
     st.write("Files Converted Successfully✌")
