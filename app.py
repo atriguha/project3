@@ -7,6 +7,7 @@ import glob
 import pandas as pd
 import numpy as np
 import datetime
+import time
 from pathlib import Path
 from datetime import datetime
 
@@ -840,260 +841,268 @@ st.write('1. previous point\n', '2. 2*last-2nd_last\n', '3. overall_mean\n',
          '4. 12_point_strategy\n', '5. mean of previous 2 point\n',
          '6. all seqential\n', '7. all parallel\n')
 sch = int(st.number_input('Choose Replacement Method From Above:'))
+flag=0
 if sch > 7:
     print('Please enter correct choice...')
 else:
     filelist = st.file_uploader(
         "Upload your files here", accept_multiple_files=True)
+    
     butt = st.button("Convert")
 # print(filelist.name)
         # fileList = open('input_file_list.txt', 'r')
+    
     if butt:
-        files = []
-        for f in filelist:
-            files.append(f.name)
+        if len(filelist)==0:
+            st.write("Please upload input files!!!")
+        else:
+            flag=1
+            files = []
+            for f in filelist:
+                files.append(f.name)
 
+            # files = fileList.readlines()
+            for file in files:
+                # input_filename = file.strip()
+                input_filename = file
+
+                base = (Path(input_filename).stem.strip())
+                output_csv = base+".csv"
+
+                header_list = ['Time', 'SL', 'counter', 'U', 'V', 'W', 'W1', 'AMP-U', 'AMP-V', 'AMP-W',
+                            'AMP-W1', 'SNR_U', 'SNR_V', 'SNR_W', 'SNR-W1', 'Corr_U', 'Corr_V', 'Corr_W', 'Corr-W1']
+                dataframe = pd.read_csv(input_filename, delimiter=" +")
+                dataframe.to_csv(output_csv, encoding='utf-8',
+                                header=header_list, index=False)
+
+        # fileList = open('input_file_list.txt', 'r')
         # files = fileList.readlines()
-        for file in files:
-            # input_filename = file.strip()
-            input_filename = file
+            cnt=100/len(files)
+            num=0
+            bar=st.progress(num)
+            # bar.progress(100)
+            for file in files:
+                num+=cnt
+                # print(num)
+                input_filename = file.strip()[:-3]+'csv'
+                try:
+                    input_data = pd.read_csv(input_filename)
+                except:
+                    print(input_filename)
+                    continue
+                N = input_data['U'].count()
 
-            base = (Path(input_filename).stem.strip())
-            output_csv = base+".csv"
+                if tch == 1 or tch == 8:
+                    if sch > 5:
+                        iList = [1, 2, 3, 4, 5]
+                    else:
+                        iList = [sch]
+                    for i in iList:
+                        if sch == 7:
+                            input_data = pd.read_csv(input_filename)
+                        data = input_data
+                        find_mean()
+                        find_std()
+                        Corr_All(i, corr)
+                        allfunction()
+                        name = f"{input_filename}_filtered_by_correlation{corr}_all_replacement_strategy_{i}"
+                        write_timestamp_to_file(name)
+                        name = add_front_name(name, i)
+                        store()
 
-            header_list = ['Time', 'SL', 'counter', 'U', 'V', 'W', 'W1', 'AMP-U', 'AMP-V', 'AMP-W',
-                           'AMP-W1', 'SNR_U', 'SNR_V', 'SNR_W', 'SNR-W1', 'Corr_U', 'Corr_V', 'Corr_W', 'Corr-W1']
-            dataframe = pd.read_csv(input_filename, delimiter=" +")
-            dataframe.to_csv(output_csv, encoding='utf-8',
-                             header=header_list, index=False)
+                        data = input_data
+                        find_mean()
+                        find_std()
+                        Corr_One(i, corr)
+                        allfunction()
+                        name = f"{input_filename}_filtered_by_correlation{corr}_individual_replacement_strategy_{i}"
+                        write_timestamp_to_file(name)
+                        name = add_front_name(name, i)
+                        store()
 
-    # fileList = open('input_file_list.txt', 'r')
-    # files = fileList.readlines()
-        cnt=100/len(files)
-        num=0
-        bar=st.progress(num)
-        # bar.progress(100)
-        for file in files:
-            num+=cnt
-            # print(num)
-            bar.progress(int(num))
-            input_filename = file.strip()[:-3]+'csv'
-            try:
-                input_data = pd.read_csv(input_filename)
-            except:
-                print(input_filename)
-                continue
-            N = input_data['U'].count()
+                if tch == 2 or tch == 8:
+                    if sch > 5:
+                        iList = [1, 2, 3, 4, 5]
+                    else:
+                        iList = [sch]
+                    for i in iList:
+                        if sch == 7:
+                            input_data = pd.read_csv(input_filename)
+                        data = input_data
+                        find_mean()
+                        find_std()
+                        SNR_All(i, SNR)
+                        allfunction()
+                        name = f"{input_filename}_filtered_by_SNR{SNR}_all_replacement_strategy_{i}"
+                        write_timestamp_to_file(name)
+                        name = add_front_name(name, i)
+                        store()
 
-            if tch == 1 or tch == 8:
-                if sch > 5:
-                    iList = [1, 2, 3, 4, 5]
-                else:
-                    iList = [sch]
-                for i in iList:
-                    if sch == 7:
-                        input_data = pd.read_csv(input_filename)
-                    data = input_data
-                    find_mean()
-                    find_std()
-                    Corr_All(i, corr)
-                    allfunction()
-                    name = f"{input_filename}_filtered_by_correlation{corr}_all_replacement_strategy_{i}"
-                    write_timestamp_to_file(name)
-                    name = add_front_name(name, i)
-                    store()
+                        data = input_data
+                        find_mean()
+                        find_std()
+                        SNR_One(i, SNR)
+                        allfunction()
+                        name = f"{input_filename}_filtered_by_SNR{SNR}_individual_replacement_strategy_{i}"
+                        write_timestamp_to_file(name)
+                        name = add_front_name(name, i)
+                        store()
 
-                    data = input_data
-                    find_mean()
-                    find_std()
-                    Corr_One(i, corr)
-                    allfunction()
-                    name = f"{input_filename}_filtered_by_correlation{corr}_individual_replacement_strategy_{i}"
-                    write_timestamp_to_file(name)
-                    name = add_front_name(name, i)
-                    store()
+                if tch == 3 or tch == 8:
+                    if sch > 5:
+                        iList = [1, 2, 3, 4, 5]
+                    else:
+                        iList = [sch]
+                    for i in iList:
+                        if sch == 7:
+                            input_data = pd.read_csv(input_filename)
+                        data = input_data
+                        find_mean()
+                        find_std()
+                        update_acceleration_all_at_time(i)
+                        allfunction()
+                        name = f"{input_filename}_filtered_by_acceleration_1.5_all_replacement_strategy_{i}"
+                        write_timestamp_to_file(name)
+                        name = add_front_name(name, i)
+                        store()
 
-            if tch == 2 or tch == 8:
-                if sch > 5:
-                    iList = [1, 2, 3, 4, 5]
-                else:
-                    iList = [sch]
-                for i in iList:
-                    if sch == 7:
-                        input_data = pd.read_csv(input_filename)
-                    data = input_data
-                    find_mean()
-                    find_std()
-                    SNR_All(i, SNR)
-                    allfunction()
-                    name = f"{input_filename}_filtered_by_SNR{SNR}_all_replacement_strategy_{i}"
-                    write_timestamp_to_file(name)
-                    name = add_front_name(name, i)
-                    store()
+                        data = input_data
+                        find_mean()
+                        find_std()
+                        update_acceleration_one_at_time(i)
+                        allfunction()
+                        name = f"{input_filename}_filtered_by_acceleration_1.5_individual_replacement_strategy_{i}"
+                        write_timestamp_to_file(name)
+                        name = add_front_name(name, i)
+                        store()
 
-                    data = input_data
-                    find_mean()
-                    find_std()
-                    SNR_One(i, SNR)
-                    allfunction()
-                    name = f"{input_filename}_filtered_by_SNR{SNR}_individual_replacement_strategy_{i}"
-                    write_timestamp_to_file(name)
-                    name = add_front_name(name, i)
-                    store()
+                if tch == 4 or tch == 8:
+                    if sch > 5:
+                        iList = [1, 2, 3, 4, 5]
+                    else:
+                        iList = [sch]
+                    for i in iList:
+                        if sch == 7:
+                            input_data = pd.read_csv(input_filename)
+                        data = input_data
+                        find_mean()
+                        find_std()
+                        Corr_All(i, corr)
+                        SNR_All(i, SNR)
+                        allfunction()
+                        name = f"{input_filename}_filtered_by_correlation{corr}_SNR{SNR}_all_replacement_strategy_{i}"
+                        write_timestamp_to_file(name)
+                        name = add_front_name(name, i)
+                        store()
 
-            if tch == 3 or tch == 8:
-                if sch > 5:
-                    iList = [1, 2, 3, 4, 5]
-                else:
-                    iList = [sch]
-                for i in iList:
-                    if sch == 7:
-                        input_data = pd.read_csv(input_filename)
-                    data = input_data
-                    find_mean()
-                    find_std()
-                    update_acceleration_all_at_time(i)
-                    allfunction()
-                    name = f"{input_filename}_filtered_by_acceleration_1.5_all_replacement_strategy_{i}"
-                    write_timestamp_to_file(name)
-                    name = add_front_name(name, i)
-                    store()
+                        data = input_data
+                        find_mean()
+                        find_std()
+                        Corr_One(i, corr)
+                        SNR_One(i, SNR)
+                        allfunction()
+                        name = f"{input_filename}_filtered_by_correlation{corr}_SNR{SNR}_individual_replacement_strategy_{i}"
+                        write_timestamp_to_file(name)
+                        name = add_front_name(name, i)
+                        store()
 
-                    data = input_data
-                    find_mean()
-                    find_std()
-                    update_acceleration_one_at_time(i)
-                    allfunction()
-                    name = f"{input_filename}_filtered_by_acceleration_1.5_individual_replacement_strategy_{i}"
-                    write_timestamp_to_file(name)
-                    name = add_front_name(name, i)
-                    store()
+                if tch == 5 or tch == 8:
+                    if sch > 5:
+                        iList = [1, 2, 3, 4, 5]
+                    else:
+                        iList = [sch]
+                    for i in iList:
+                        if sch == 7:
+                            input_data = pd.read_csv(input_filename)
+                        data = input_data
+                        find_mean()
+                        find_std()
+                        SNR_All(i, SNR)
+                        update_acceleration_all_at_time(i)
+                        allfunction()
+                        name = f"{input_filename}_filtered_by_SNR{SNR}_Acceleration_1.5_all_replacement_strategy_{i}"
+                        write_timestamp_to_file(name)
+                        name = add_front_name(name, i)
+                        store()
 
-            if tch == 4 or tch == 8:
-                if sch > 5:
-                    iList = [1, 2, 3, 4, 5]
-                else:
-                    iList = [sch]
-                for i in iList:
-                    if sch == 7:
-                        input_data = pd.read_csv(input_filename)
-                    data = input_data
-                    find_mean()
-                    find_std()
-                    Corr_All(i, corr)
-                    SNR_All(i, SNR)
-                    allfunction()
-                    name = f"{input_filename}_filtered_by_correlation{corr}_SNR{SNR}_all_replacement_strategy_{i}"
-                    write_timestamp_to_file(name)
-                    name = add_front_name(name, i)
-                    store()
+                        data = input_data
+                        find_mean()
+                        find_std()
+                        SNR_One(i, SNR)
+                        update_acceleration_all_at_time(i)
+                        allfunction()
+                        name = f"{input_filename}_filtered_by_SNR{SNR}_acceleration_1.5_individual_replacement_strategy_{i}"
+                        write_timestamp_to_file(name)
+                        name = add_front_name(name, i)
+                        store()
 
-                    data = input_data
-                    find_mean()
-                    find_std()
-                    Corr_One(i, corr)
-                    SNR_One(i, SNR)
-                    allfunction()
-                    name = f"{input_filename}_filtered_by_correlation{corr}_SNR{SNR}_individual_replacement_strategy_{i}"
-                    write_timestamp_to_file(name)
-                    name = add_front_name(name, i)
-                    store()
+                if tch == 6 or tch == 8:
+                    if sch > 5:
+                        iList = [1, 2, 3, 4, 5]
+                    else:
+                        iList = [sch]
+                    for i in iList:
+                        if sch == 7:
+                            input_data = pd.read_csv(input_filename)
+                        data = input_data
+                        find_mean()
+                        find_std()
+                        Corr_All(i, corr)
+                        update_acceleration_all_at_time(i)
+                        allfunction()
+                        name = f"{input_filename}_filtered_by_correlation{corr}_Acceleration_1.5_all_replacement_strategy_{i}"
+                        write_timestamp_to_file(name)
+                        name = add_front_name(name, i)
+                        store()
 
-            if tch == 5 or tch == 8:
-                if sch > 5:
-                    iList = [1, 2, 3, 4, 5]
-                else:
-                    iList = [sch]
-                for i in iList:
-                    if sch == 7:
-                        input_data = pd.read_csv(input_filename)
-                    data = input_data
-                    find_mean()
-                    find_std()
-                    SNR_All(i, SNR)
-                    update_acceleration_all_at_time(i)
-                    allfunction()
-                    name = f"{input_filename}_filtered_by_SNR{SNR}_Acceleration_1.5_all_replacement_strategy_{i}"
-                    write_timestamp_to_file(name)
-                    name = add_front_name(name, i)
-                    store()
+                        data = input_data
+                        find_mean()
+                        find_std()
+                        Corr_One(i, corr)
+                        update_acceleration_all_at_time(i)
+                        allfunction()
+                        name = f"{input_filename}_filtered_by_correlation{corr}_acceleration_1.5_individual_replacement_strategy_{i}"
+                        write_timestamp_to_file(name)
+                        name = add_front_name(name, i)
+                        store()
 
-                    data = input_data
-                    find_mean()
-                    find_std()
-                    SNR_One(i, SNR)
-                    update_acceleration_all_at_time(i)
-                    allfunction()
-                    name = f"{input_filename}_filtered_by_SNR{SNR}_acceleration_1.5_individual_replacement_strategy_{i}"
-                    write_timestamp_to_file(name)
-                    name = add_front_name(name, i)
-                    store()
+                if tch == 7 or tch == 8:
+                    if sch > 5:
+                        iList = [1, 2, 3, 4, 5]
+                    else:
+                        iList = [sch]
+                    for i in iList:
+                        if sch == 7:
+                            input_data = pd.read_csv(input_filename)
+                        data = input_data
+                        find_mean()
+                        find_std()
+                        Corr_All(i, corr)
+                        SNR_All(i, SNR)
+                        update_acceleration_all_at_time(i)
+                        allfunction()
+                        name = f"{input_filename}_filtered_by_correlation{corr}_SNR{SNR}_Acceleration_1.5_all_replacement_strategy_{i}"
+                        write_timestamp_to_file(name)
 
-            if tch == 6 or tch == 8:
-                if sch > 5:
-                    iList = [1, 2, 3, 4, 5]
-                else:
-                    iList = [sch]
-                for i in iList:
-                    if sch == 7:
-                        input_data = pd.read_csv(input_filename)
-                    data = input_data
-                    find_mean()
-                    find_std()
-                    Corr_All(i, corr)
-                    update_acceleration_all_at_time(i)
-                    allfunction()
-                    name = f"{input_filename}_filtered_by_correlation{corr}_Acceleration_1.5_all_replacement_strategy_{i}"
-                    write_timestamp_to_file(name)
-                    name = add_front_name(name, i)
-                    store()
+                        name = add_front_name(name, i)
+                        store()
 
-                    data = input_data
-                    find_mean()
-                    find_std()
-                    Corr_One(i, corr)
-                    update_acceleration_all_at_time(i)
-                    allfunction()
-                    name = f"{input_filename}_filtered_by_correlation{corr}_acceleration_1.5_individual_replacement_strategy_{i}"
-                    write_timestamp_to_file(name)
-                    name = add_front_name(name, i)
-                    store()
+                        data = input_data
+                        find_mean()
+                        find_std()
+                        Corr_One(i, corr)
+                        SNR_One(i, SNR)
+                        update_acceleration_all_at_time(i)
+                        allfunction()
+                        name = f"{input_filename}_filtered_by_correlation{corr}_SNR{SNR}_acceleration_1.5_individual_replacement_strategy_{i}"
+                        write_timestamp_to_file(name)
+                        name = add_front_name(name, i)
+                        store()
+                bar.progress(int(num))
 
-            if tch == 7 or tch == 8:
-                if sch > 5:
-                    iList = [1, 2, 3, 4, 5]
-                else:
-                    iList = [sch]
-                for i in iList:
-                    if sch == 7:
-                        input_data = pd.read_csv(input_filename)
-                    data = input_data
-                    find_mean()
-                    find_std()
-                    Corr_All(i, corr)
-                    SNR_All(i, SNR)
-                    update_acceleration_all_at_time(i)
-                    allfunction()
-                    name = f"{input_filename}_filtered_by_correlation{corr}_SNR{SNR}_Acceleration_1.5_all_replacement_strategy_{i}"
-                    write_timestamp_to_file(name)
-
-                    name = add_front_name(name, i)
-                    store()
-
-                    data = input_data
-                    find_mean()
-                    find_std()
-                    Corr_One(i, corr)
-                    SNR_One(i, SNR)
-                    update_acceleration_all_at_time(i)
-                    allfunction()
-                    name = f"{input_filename}_filtered_by_correlation{corr}_SNR{SNR}_acceleration_1.5_individual_replacement_strategy_{i}"
-                    write_timestamp_to_file(name)
-                    name = add_front_name(name, i)
-                    store()
-
-
-st.write("Files Converted Successfully")
+if flag==1:
+    time.sleep(0.5)
+    st.write("Files Converted Successfully✌")
 end_time = datetime.now()
 
 print("-------------------------------------------------------------------")
